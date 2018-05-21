@@ -66,6 +66,7 @@ public class DBHelper extends SQLiteOpenHelper {
         ArrayList<Song> songs = new ArrayList<Song>();
         // "SELECT id, note_content, stars FROM note"
         String selectQuery = "SELECT "
+                + COLUMN_ID + ","
                 + COLUMN_TITLE + ","
                 + COLUMN_SINGERS + ","
                 + COLUMN_YEAR + ","
@@ -77,10 +78,10 @@ public class DBHelper extends SQLiteOpenHelper {
         // Loop through all rows and add to ArrayList
         if (cursor.moveToFirst()) {
             do {
-                String title = cursor.getString(0);
-                String singers = cursor.getString(1);
-                int year = cursor.getInt(2);
-                int stars = cursor.getInt(3);
+                String title = cursor.getString(1);
+                String singers = cursor.getString(2);
+                int year = cursor.getInt(3);
+                int stars = cursor.getInt(4);
 
                 Song song = new Song(title, singers, year ,stars);
                 songs.add(song);
@@ -90,6 +91,29 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return songs;
+    }
+
+    public int updateSong(Song data){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TITLE, data.getTitle());
+        values.put(COLUMN_SINGERS, data.getSingers());
+        values.put(COLUMN_YEAR, data.getYear());
+        values.put(COLUMN_STARS, data.getStars());
+        String condition = COLUMN_ID + "= ?";
+        String[] args = {String.valueOf(data.get_id())};
+        int result = db.update(TABLE_SONG, values, condition, args);
+        db.close();
+        return result;
+    }
+
+    public int deleteSong(int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String condition = COLUMN_ID + "= ?";
+        String[] args = {String.valueOf(id)};
+        int result = db.delete(TABLE_SONG, condition, args);
+        db.close();
+        return result;
     }
 
 }

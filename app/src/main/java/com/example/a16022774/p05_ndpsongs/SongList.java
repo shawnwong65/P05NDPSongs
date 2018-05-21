@@ -25,10 +25,14 @@ public class SongList extends AppCompatActivity {
         lv = (ListView) findViewById(R.id.lv);
 
         DBHelper db = new DBHelper(SongList.this);
-        songs = db.getAllSongs();
+        songs = new ArrayList<Song>();
+        songs.clear();
+        songs.addAll(db.getAllSongs());
+        db.close();
 
         ca = new CustomAdapter(SongList.this, R.layout.row, songs);
         lv.setAdapter(ca);
+        ca.notifyDataSetChanged();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -37,7 +41,7 @@ public class SongList extends AppCompatActivity {
                 Intent i = new Intent(SongList.this,
                         EditActivity.class);
                 Song data = songs.get(position);
-                int id = data.get_id();
+                int id = position;
                 String title = data.getTitle();
                 String singers = data.getSingers();
                 int year = data.getYear();
@@ -51,5 +55,15 @@ public class SongList extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK && requestCode == 9){
+            ca.notifyDataSetChanged();
+        }
     }
 }
